@@ -10,9 +10,12 @@ import cv2
 import numpy as np
 import uuid
 from streamlit_option_menu import option_menu
+from io import BytesIO
+from docx import Document
 
 defaultConfig(1)
-st.title("Latex Generator")
+st.image("./media/logo.png")
+st.text("To convert a Math Equation to its equivalent LaTeX Code, upload image of the equation from your device")
 IMAGENAME = ''
 
 class VideoTransformer(VideoTransformerBase):
@@ -98,13 +101,19 @@ def app():
                 st.text("Complied Latex")
                 st.latex(generatedLatex)
 
-                with st.expander("Download LaTeX code", expanded=False):
-                    st.download_button(
-                        label="Download LaTeX",
-                        data=generatedLatex,
-                        file_name="generated_latex.text",
-                        mime="text/plain",
-                    )
+                document = Document()
+                document.add_paragraph(generatedLatex)
+                stream = BytesIO()
+
+                document.save(stream)
+                stream.seek(0)
+                
+                st.download_button(
+                    label="Download LaTeX as Word file",
+                    data= stream,
+                    file_name='generated_latex.docx',
+                    mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                )
 
     if selected == "Upload":
         uploaded_file = st.file_uploader('Choose an image file', type=['jpg','png', 'jpeg'])
@@ -121,13 +130,19 @@ def app():
             st.write("Complied Latex")
             st.latex(generatedLatex)
             
-            with st.expander("Download LaTeX code", expanded=False):
-                st.download_button(
-                    label="Download LaTeX",
-                    data=generatedLatex,
-                    file_name="generated_latex.text",
-                    mime="text/plain",
-                )
+            document = Document()
+            document.add_paragraph(generatedLatex)
+            stream = BytesIO()
+
+            document.save(stream)
+            stream.seek(0)
+            
+            st.download_button(
+                label="Download LaTeX as Word file",
+                data= stream,
+                file_name='generated_latex.docx',
+                mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
 
 if __name__ == "__main__":
     app()
