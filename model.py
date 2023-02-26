@@ -1,7 +1,7 @@
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 from tokenizers import Tokenizer
 import streamlit as st
-
+from tabula import read_pdf
 
 def model(image):
 
@@ -27,5 +27,11 @@ def model(image):
 
     return generated_text
 
+def tableModel(path:str):
+    return read_pdf(path,stream=True)
+
+
+
 if __name__ == "__main__":
     model()
+    tableModel()

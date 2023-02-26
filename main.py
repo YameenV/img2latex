@@ -4,7 +4,7 @@ from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import threading
 from typing import Union
 import av
-from model import model
+from model import model, tableModel
 from PIL import Image
 import cv2
 import numpy as np
@@ -116,33 +116,66 @@ def app():
                 )
 
     if selected == "Upload":
-        uploaded_file = st.file_uploader('Choose an image file', type=['jpg','png', 'jpeg'])
+        
+        image = st.checkbox('Upload a Image')
+        if image:
+            imageUploaded = st.file_uploader('Choose an image file', type=['jpg','png', 'jpeg'])
+            if imageUploaded is not None:
+                process_image(imageUploaded)
+                arrayImage = Image.open(imageUploaded)
+                display_image = np.array(arrayImage)
 
-        if uploaded_file is not None:
-            process_image(uploaded_file)
-            arrayImage = Image.open(uploaded_file)
-            display_image = np.array(arrayImage)
+                generatedLatex = model(arrayImage)
+                st.balloons()
+                st.write("Generated Latex")
+                st.code(generatedLatex, language='latex')
+                st.write("Complied Latex")
+                st.latex(generatedLatex)
+                
+                document = Document()
+                document.add_paragraph(generatedLatex)
+                stream = BytesIO()
 
-            generatedLatex = model(arrayImage)
-            st.balloons()
-            st.write("Generated Latex")
-            st.code(generatedLatex, language='latex')
-            st.write("Complied Latex")
-            st.latex(generatedLatex)
-            
-            document = Document()
-            document.add_paragraph(generatedLatex)
-            stream = BytesIO()
+                document.save(stream)
+                stream.seek(0)
+                
+                st.download_button(
+                    label="Download LaTeX as Word file",
+                    data= stream,
+                    file_name='generated_latex.docx',
+                    mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                )
 
-            document.save(stream)
-            stream.seek(0)
-            
-            st.download_button(
-                label="Download LaTeX as Word file",
-                data= stream,
-                file_name='generated_latex.docx',
-                mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            )
+        pdf = st.checkbox("Upload a PDf ( For table to latext )")
+        if pdf:
+            pdfUploaded = st.file_uploader('Choose an PDF file', type=['pdf'])
+            if pdfUploaded:
+                re = tableModel(pdfUploaded)
+                st.balloons()
+                st.write("Generated Latex")
+                generatedTableLatex = re[0].to_latex()
+                generatedTabledf = re[0]
+                st.code(generatedTableLatex, language="latex")
+                print(generatedTableLatex)
+                st.write("Complied Latex")
+                st.dataframe(generatedTabledf)
+                
+                document = Document()
+                document.add_paragraph(generatedTableLatex)
+                stream = BytesIO()
+
+                document.save(stream)
+                stream.seek(0)
+                
+                st.download_button(
+                    label="Download LaTeX as Word file",
+                    data= stream,
+                    file_name='generated_latex.docx',
+                    mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                )
+
+
+        
 
 if __name__ == "__main__":
     app()
