@@ -46,13 +46,13 @@ def app():
 
     selected = option_menu(
         None, 
-        options=["Scanner","Upload"],
-        icons=["webcam", "box-arrow-in-down"],
+        options=["Scan","Img","Table", "FAQ","Help","About"],
+        icons=["webcam", "file-image", "table", "patch-question", "info-circle", "file-earmark-person"],
         menu_icon="cast",
         default_index=1,
         orientation="horizontal")
     
-    if selected == "Scanner":
+    if selected == "Scan":
         webcam = st.empty()
 
         with webcam:
@@ -115,64 +115,162 @@ def app():
                     mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                 )
 
-    if selected == "Upload":
+    if selected == "Img":
+        imageHead = Image.open('./images/img-latex.jpg')
+
+        st.image(imageHead)
         
-        image = st.checkbox('Upload a Image')
-        if image:
-            imageUploaded = st.file_uploader('Choose an image file', type=['jpg','png', 'jpeg'])
-            if imageUploaded is not None:
-                process_image(imageUploaded)
-                arrayImage = Image.open(imageUploaded)
-                display_image = np.array(arrayImage)
+        imageUploaded = st.file_uploader('Choose an image file', type=['jpg','png', 'jpeg'])
+        if imageUploaded is not None:
+            process_image(imageUploaded)
+            arrayImage = Image.open(imageUploaded)
+            display_image = np.array(arrayImage)
 
-                generatedLatex = model(arrayImage)
-                st.balloons()
-                st.write("Generated Latex")
-                st.code(generatedLatex, language='latex')
-                st.write("Complied Latex")
-                st.latex(generatedLatex)
-                
-                document = Document()
-                document.add_paragraph(generatedLatex)
-                stream = BytesIO()
+            generatedLatex = model(arrayImage)
+            st.balloons()
+            st.write("Generated Latex")
+            st.code(generatedLatex, language='latex')
+            st.write("Complied Latex")
+            st.latex(generatedLatex)
+            
+            document = Document()
+            document.add_paragraph(generatedLatex)
+            stream = BytesIO()
 
-                document.save(stream)
-                stream.seek(0)
-                
-                st.download_button(
-                    label="Download LaTeX as Word file",
-                    data= stream,
-                    file_name='generated_latex.docx',
-                    mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                )
+            document.save(stream)
+            stream.seek(0)
+            
+            st.download_button(
+                label="Download LaTeX as Word file",
+                data= stream,
+                file_name='generated_latex.docx',
+                mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
+    
+    if selected == "Table":
+        imageHead = Image.open('./images/tabel-latex.jpg')
 
-        pdf = st.checkbox("Upload a PDf ( For table to latext )")
-        if pdf:
-            pdfUploaded = st.file_uploader('Choose an PDF file', type=['pdf'])
-            if pdfUploaded:
-                re = tableModel(pdfUploaded)
-                st.balloons()
-                st.write("Generated Latex")
-                generatedTableLatex = re[0].to_latex()
-                generatedTabledf = re[0]
-                st.code(generatedTableLatex, language="latex")
-                print(generatedTableLatex)
-                st.write("Complied Latex")
-                st.dataframe(generatedTabledf)
-                
-                document = Document()
-                document.add_paragraph(generatedTableLatex)
-                stream = BytesIO()
+        st.image(imageHead)
 
-                document.save(stream)
-                stream.seek(0)
-                
-                st.download_button(
-                    label="Download LaTeX as Word file",
-                    data= stream,
-                    file_name='generated_latex.docx',
-                    mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                )
+        pdfUploaded = st.file_uploader('Choose an PDF file', type=['pdf'])
+        if pdfUploaded:
+            re = tableModel(pdfUploaded)
+            st.balloons()
+            st.write("Generated Latex")
+            generatedTableLatex = re[0].to_latex()
+            generatedTabledf = re[0]
+            st.code(generatedTableLatex, language="latex")
+            print(generatedTableLatex)
+            st.write("Complied Latex")
+            st.dataframe(generatedTabledf)
+            
+            document = Document()
+            document.add_paragraph(generatedTableLatex)
+            stream = BytesIO()
+
+            document.save(stream)
+            stream.seek(0)
+            
+            st.download_button(
+                label="Download LaTeX as Word file",
+                data= stream,
+                file_name='generated_latex.docx',
+                mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            )
+
+    if selected == "FAQ":
+        st.text(''' 
+        
+        Frequently Asked Questions
+        Let’s clear your Doubts!
+
+
+    • Can I upload any format of files to convert it to LaTeX?
+        As we provide three types of conversion, the format of files for each 
+        conversion differs. 
+        For Equation to LaTeX it supports jpg, jpeg, png
+        For Table to LaTeX it supports pdf
+        For Text to LaTeX it supports pdf, text.
+
+    • Why does the Equation to LaTeX conversion take so long?
+        At times it depends on the complexity of the equation, size of the image, 
+        internet speed. If the equation is too long then it will take some time to 
+        process it so that the accuracy level is not affected.
+
+    • Can I upload an Excel Sheet to convert the table?
+        Not the excel sheet but excel to pdf converted file will work to convert 
+        any type of table irrespective to the complexity of the table.
+
+    • If the image of an Equation is a slight blur, can I get the LaTeX code?
+        Yes, the image will be converted to its desired output irrespective of the 
+        quality of image so blur factor does not affect the output.
+
+    • Is your website free to use?
+        Yes, it is completely free.
+
+    • Is it safe to upload my files to your website?
+        Yes, it is safe to upload your files to our website. We take the security 
+        and privacy of our users very seriously and have implemented several measures 
+        to ensure that your files are protected.
+        ''')
+
+    if selected == "About":
+        st.text('''
+        On this platform We are Specifiacaly Focused on to the help Researcher ,Where 
+        they can get Latex Code of all equation by Uploading it through this website .
+        Latex Convertor makes life easy for technlogy enthusiastic where we help you 
+        to get the latex  code of any equation in just few click ,simply by uploading it.
+        latex Convertor help you to get the latex code of any equation,tables and excel 
+        to get the latex code.
+        You can get latex code of all the content by just uploading it in pdf,word,excel 
+        and table format or you can also get the latex code of respective input by just 
+        clicking the picture through web camera and uploading it on our website.
+        Latex Convertor provides you the access to download the output(latex code ) in pdf 
+        format  
+                ''')
+
+    if selected == "Help":
+        st.text('''
+        STEPS FOR COVERSION
+            1. Equation to LaTeX
+            2. Open a web browser and go to our LaTeX converter website. 
+            3. Click on “Choose File” to select your image of the equation from your PC 
+            or Mobile. After choosing, click on “Upload”.
+            4. Wait for the website to process the equation and generate the LaTeX code.
+            5. Once the LaTeX code is generated, copy it from the website.
+            6. Open a LaTeX editor or document and paste the LaTeX code into it.
+            7. Compile the LaTeX document to see the equation in the desired format.
+            8. Check for any errors or formatting issues and make necessary changes.
+            9. Save the document with the equation in the desired format.
+
+        2.  Table to LaTeX
+            1. Copy the table you want to convert from the source document or website and 
+            paste it into a PDF file. Make sure that the table is formatted correctly and 
+            contains all the necessary information.
+            2. Open a web browser and go to our LaTeX converter website.
+            3. Click on “Choose File” to select the PDF file from your PC or Mobile. After 
+            choosing, click on “Upload” to upload the PDF file of the table.
+            4. Copy the output: Once the conversion is complete, the website will provide 
+            you with the LaTeX code for the table. Copy this code to use it in your LaTeX 
+            document.
+            5. Insert the table: Open your LaTeX document and paste the copied code where 
+            you want the table to appear. Make sure that you have included the necessary 
+            packages in your document preamble to render the table correctly.
+            6. Compile the document: Save your document and compile it using your preferred 
+            LaTeX compiler. The table should now appear in your document.
+
+        3.  Text to LaTeX
+            1. Copy the text you want to convert and paste it into a PDF file.
+            2. Open a web browser and go to our LaTeX converter website. 
+            3. Click on “Choose File” to select your image from your PC or Mobile. After 
+            choosing, click on “Upload” to upload the PDF file which contains the required 
+            text to be converted.
+            4. Wait for the website to process the text and generate the LaTeX code. This may 
+            take a few seconds or longer depending on the length and complexity of the text.
+            5. Review the LaTeX code that is generated and make any necessary adjustments or 
+            edits.
+            6. Copy the final LaTeX code and use it as needed in your document or project.
+        ''')
 
 
         
